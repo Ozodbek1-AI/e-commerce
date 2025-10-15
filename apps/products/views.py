@@ -5,9 +5,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.products.models import Product
-from apps.products.serializers import ProductModelSerializer, ProductDetailSerializer
+from apps.products.serializers import ProductModelSerializer, ProductDetailSerializer, ProductUpdateSerializer
 
 
+#Product create
 class ProductCreateAPIView(APIView):
     serializer_class = ProductModelSerializer
 
@@ -19,7 +20,7 @@ class ProductCreateAPIView(APIView):
         else:
             return Response(data=serializer.errors)
 
-
+#Product list
 class ProductListAPIView(APIView):
     def get(self,request):
         products = Product.objects.filter(is_active=True)
@@ -54,7 +55,7 @@ class ProductListAPIView(APIView):
         serializer = ProductModelSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+#Product detail
 class ProductDetailAPIView(APIView):
     def get(self, request, pk):
         try:
@@ -65,3 +66,25 @@ class ProductDetailAPIView(APIView):
         serializer = ProductDetailSerializer(product)
         return Response(serializer.data)
 
+#Product Update
+class ProductUpdateAPIView(APIView):
+    def put(self,request,pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response({'error':'Product not found'},status=404)
+
+        serializer = ProductUpdateSerializer(instance=product,data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Product updated", "data": serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
