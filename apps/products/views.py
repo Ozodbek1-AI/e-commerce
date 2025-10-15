@@ -20,6 +20,7 @@ class ProductCreateAPIView(APIView):
         else:
             return Response(data=serializer.errors)
 
+
 #Product list
 class ProductListAPIView(APIView):
     def get(self,request):
@@ -89,7 +90,7 @@ class ProductUpdateAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
+#product update patch
 class ProductPatchUpdateAPIView(APIView):
     def patch(self,request,pk):
         try:
