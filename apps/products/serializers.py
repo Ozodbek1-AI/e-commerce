@@ -1,7 +1,10 @@
 from rest_framework import serializers
 
-from apps.products.models import Product
+from apps.products.models import Product, Category, Brand, ProductImage
 from django.utils.text import slugify
+
+from apps.reviews.models import ProductReview
+
 
 class ProductModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,7 +32,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     max_price = serializers.SerializerMethodField()
 
     class Meta:
-        match = Product
+        model = Product
         fields = '__all__'
 
     def get_min_price(self,obj):
@@ -37,3 +40,29 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_max_price(self, obj):
         return obj.price * 1.1
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = '__all__'
+
+
+# class ReviewsSerializers(serializers.ModelSerializer):
+#     class Meta:
+#         model = ProductReview
+#         fields = '__all__'
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    brand = BrandSerializer()
+    # reviews = ReviewsSerializers()
+
+    class Meta:
+        model = Product
+        fields = '__all__'
