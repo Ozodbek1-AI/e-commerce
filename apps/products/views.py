@@ -66,7 +66,7 @@ class ProductDetailAPIView(APIView):
         serializer = ProductDetailSerializer(product)
         return Response(serializer.data)
 
-#Product Update
+#Product Update put
 class ProductUpdateAPIView(APIView):
     def put(self,request,pk):
         try:
@@ -88,3 +88,37 @@ class ProductUpdateAPIView(APIView):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class ProductPatchUpdateAPIView(APIView):
+    def patch(self,request,pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response({'error':'Product not found'},status=404)
+
+        serializer = ProductUpdateSerializer(instance=product, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Product updated", "data": serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+#product delete
+class ProductDeleteAPIView(APIView):
+    def delete(self,request,pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response({'error':'Product not found'},status=404)
+
+        product.delete()
+        return Response({'message': 'Product deleted successfully'})
